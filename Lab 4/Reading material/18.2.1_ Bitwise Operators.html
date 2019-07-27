@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!-- saved from url=(0048)http://www.eskimo.com/~scs/cclass/int/sx4ab.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<link rev="owner" href="mailto:scs@eskimo.com">
+<link rev="made" href="mailto:scs@eskimo.com">
+<title>18.2.1: Bitwise Operators</title>
+<link href="http://www.eskimo.com/~scs/cclass/int/sx4b.html" rev="precedes">
+<link href="http://www.eskimo.com/~scs/cclass/int/sx4bb.html" rel="precedes">
+<link href="http://www.eskimo.com/~scs/cclass/int/sx4b.html" rev="subdocument">
+</head>
+<body>
+<h3>18.2.1: Bitwise Operators</h3>
+
+<p>[This section corresponds to K&amp;R Sec. 2.9]
+</p><p>The bitwise operators operate on numbers
+(always integers)
+as if they were
+sequences
+of binary bits
+(which, of course, internally to the computer they
+are).
+These operators will make the most sense,
+therefore,
+if we consider integers as represented in binary, octal, or hexadecimal
+(bases 2, 8, or 16),
+not decimal (base 10).
+Remember,
+
+you can use octal constants in C
+by prefixing them with an extra <tt>0</tt> (zero),
+and you can use hexadecimal constants
+by prefixing them with <tt>0x</tt>
+(or <tt>0X</tt>).
+</p><p>The <tt>&amp;</tt> operator
+performs a bitwise AND on two integers.
+Each bit in the result is 1 only if
+both corresponding bits in the two input operands are 1.
+For example, <tt>0x56 &amp; 0x32</tt> is <tt>0x12</tt>,
+because (in binary):
+</p><pre>	  0 1 0 1 0 1 1 0
+	&amp; 0 0 1 1 0 0 1 0
+	  ---------------
+	  0 0 0 1 0 0 1 0
+</pre>
+<p></p><p>The <tt>|</tt> (vertical bar) operator
+performs a bitwise OR on two integers.
+Each bit in the result is 1 if
+either of the corresponding bits in the two input operands is 1.
+For example, <tt>0x56 | 0x32</tt> is <tt>0x76</tt>,
+because:
+</p><pre>	  0 1 0 1 0 1 1 0
+	| 0 0 1 1 0 0 1 0
+	  ---------------
+	  0 1 1 1 0 1 1 0
+</pre>
+<p></p><p>The <tt>^</tt> (caret) operator
+performs a bitwise exclusive-OR on two integers.
+Each bit in the result is 1 if
+one, but not both,
+of the corresponding bits in the two input operands is 1.
+For example, <tt>0x56 ^ 0x32</tt> is <tt>0x64</tt>:
+</p><pre>	  0 1 0 1 0 1 1 0
+	^ 0 0 1 1 0 0 1 0
+	  ---------------
+	  0 1 1 0 0 1 0 0
+</pre>
+<p></p><p>The <tt>~</tt> (tilde) operator
+performs a bitwise complement on its single integer operand.
+(The <tt>~</tt> operator is therefore a unary operator,
+like <tt>!</tt>
+and the unary <tt>-</tt>, <tt>&amp;</tt>, and <tt>*</tt> operators.)
+Complementing a number means to change all the
+0 bits to 1
+and all the 1s to 0s.
+For example, assuming 16-bit integers, <tt>~0x56</tt> is <tt>0xffa9</tt>:
+</p><pre>	~ 0 0 0 0 0 0 0 0 0 1 0 1 0 1 1 0
+	  -------------------------------
+	  1 1 1 1 1 1 1 1 1 0 1 0 1 0 0 1
+</pre>
+<p></p><p>The <tt>&lt;&lt;</tt> operator
+shifts its first operand left by a number of bits
+given by its second operand,
+filling in new 0 bits at the right.
+Similarly, the <tt>&gt;&gt;</tt> operator
+shifts its first operand right.
+If the first operand is <tt>unsigned</tt>,
+<tt>&gt;&gt;</tt> fills in 0 bits from the left,
+but if the first operand is signed,
+<tt>&gt;&gt;</tt> might fill in 1 bits if the high-order bit was already 1.
+(Uncertainty like this
+is one reason why it's usually a good idea
+to use all <tt>unsigned</tt> operands
+when working with the bitwise operators.)
+For example, <tt>0x56 &lt;&lt; 2</tt> is <tt>0x158</tt>:
+</p><pre>	      0 1 0 1 0 1 1 0 &lt;&lt; 2
+	  -------------------
+	  0 1 0 1 0 1 1 0 0 0
+</pre>
+And <tt>0x56 &gt;&gt; 1</tt> is <tt>0x2b</tt>:
+<pre>	  0 1 0 1 0 1 1 0 &gt;&gt; 1
+	  ---------------
+	    0 1 0 1 0 1 1
+</pre>
+For both of the shift operators,
+bits that scroll ``off the end'' are discarded;
+they don't wrap around.
+(Therefore, <tt>0x56 &gt;&gt; 3</tt> is <tt>0x0a</tt>.)
+<p></p><p>The bitwise operators will make more sense
+if we take a look at some of the ways they're typically used.
+We can use <tt>&amp;</tt> to test if a certain bit is 1 or not.
+For example, <tt>0x56 &amp; 0x40</tt> is <tt>0x40</tt>,
+but <tt>0x32 &amp; 0x40</tt> is <tt>0x00</tt>:
+</p><pre>	  0 1 0 1 0 1 1 0	  0 0 1 1 0 0 1 0
+	&amp; 0 1 0 0 0 0 0 0	&amp; 0 1 0 0 0 0 0 0
+	  ---------------	  ---------------
+	  0 1 0 0 0 0 0 0	  0 0 0 0 0 0 0 0
+</pre>
+Since any nonzero result is considered ``true'' in C,
+we can use an expression involving <tt>&amp;</tt> directly
+to test some condition,
+for example:
+<pre>	if(x &amp; 0x04)
+		<i>do something</i> ;
+</pre>
+(If we didn't like testing against the bitwise result,
+we could equivalently say
+<tt>if((x &amp; 0x04) != 0)</tt> .
+The extra parentheses are important, as we'll explain below.)
+<p></p><p>Notice that
+the value <tt>0x40</tt>
+has exactly one 1 bit in its binary representation,
+which makes it useful for testing
+for the presence of a certain bit.
+Such a value
+is often called a <dfn>bit mask</dfn>.
+Often, we'll define a series of bit masks,
+all targeting different bits,
+and then treat a single integer value as a set of <dfn>flags</dfn>.
+A ``flag'' is an on-off, yes-no condition,
+so we only need one bit to record it, not the 16 or 32 bits
+(or more) of an <tt>int</tt>.
+Storing a set of flags in a single <tt>int</tt>
+does more than just save space,
+it also makes it convenient to assign a set of flags all at once
+from one flag variable to another,
+using the conventional assignment operator <tt>=</tt>.
+For example, if we made these definitions:
+</p><pre>	#define DIRTY	0x01
+	#define OPEN	0x02
+	#define VERBOSE	0x04
+	#define RED	0x08
+	#define SEASICK	0x10
+</pre>
+we would have set up 5 different bits
+as keeping track of those 5 different conditions
+(``dirty,'' ``open,'' etc.).
+If we had a variable
+<pre>	unsigned int flags;
+</pre>
+which contained a set of these flags,
+we could write tests like
+<pre>	if(flags &amp; DIRTY)
+		{ /* code for dirty case */ }
+</pre>
+<pre>	if(!(flags &amp; OPEN))
+		{ /* code for closed case */ }
+</pre>
+<pre>	if(flags &amp; VERBOSE)
+		{ /* code for verbose case */ }
+	else	{ /* code for quiet case */ }
+</pre>
+A condition like <tt>if(flags &amp; DIRTY)</tt>
+can be read as
+``if the <tt>DIRTY</tt> bit is on''.
+<p></p><p>These bitmasks would also be useful for <em>setting</em> the flags.
+To ``turn on the <tt>DIRTY</tt> bit,''
+we'd say
+</p><pre>	flags = flags | DIRTY;		/* set DIRTY bit */
+</pre>
+How would we ``turn off'' a bit?
+The way to do it is to leave on every bit but the one we're turning off,
+if they were on already.
+We do this with the <tt>&amp;</tt> and <tt>~</tt> operators:
+<pre>	flags = flags &amp; ~DIRTY;		/* clear DIRTY bit */
+</pre>
+This may be easier to see if we look at it in binary.
+If the <tt>DIRTY</tt>, <tt>RED</tt>, and <tt>SEASICK</tt> bits
+were already on,
+<tt>flags</tt> would be <tt>0x19</tt>, and we'd have
+<pre>	  0 0 0 1 1 0 0 1
+	&amp; 1 1 1 1 1 1 1 0
+	  ---------------
+	  0 0 0 1 1 0 0 0
+</pre>
+As you can see,
+both the <tt>|</tt> operator when turning bits on
+and the <tt>&amp;</tt> (plus <tt>~</tt>) operator when turning bits off
+have no effect if the targeted bit were already on or off, respectively.
+<p></p><p>The definition of the exclusive-OR operator
+means that you can use it to <dfn>toggle</dfn> a bit,
+that is,
+to turn it to 1 if it was 0 and to 0 if it was one:
+</p><pre>	flags = flags ^ VERBOSE;	/* toggle VERBOSE bit */
+</pre>
+<p></p><p>It's common to use the ``<i>op</i><tt>=</tt>'' shorthand forms
+when doing all of these operations:
+</p><pre>	flags |= DIRTY;			/* set DIRTY bit */
+	flags &amp;= ~OPEN;			/* clear OPEN bit */
+	flags ^= VERBOSE;		/* toggle VERBOSE bit */
+</pre>
+<p></p><p>We can also use the bitwise operators to extract
+subsets of bits from the middle of
+an integer.
+For example,
+to extract the second-to-last hexadecimal ``digit,''
+we could use
+</p><pre>	(i &amp; 0xf0) &gt;&gt; 4
+</pre>
+If <tt>i</tt> was <tt>0x56</tt>, we have:
+<pre>	     i		  0 1 0 1 0 1 1 0
+	&amp; 0x56		&amp; 1 1 1 1 0 0 0 0
+			  ---------------
+			  0 1 0 1 0 0 0 0
+</pre>
+and shifting this result right by 4 bits
+gives us <tt>0 1 0 1</tt>,
+or 5,
+as we wished.
+Replacing
+(or overwriting)
+a subset of bits
+is a bit more complicated;
+we must first use <tt>&amp;</tt> and <tt>~</tt>
+to clear all of the destination bits,
+then use <tt>&lt;&lt;</tt> and <tt>|</tt> to ``OR in''
+the new bits.
+For example,
+to replace that second-to-last hexadecimal digit
+with some new bits,
+we might use:
+<pre>	(i &amp; ~0xf0) | (newbits &lt;&lt; 4)
+</pre>
+If <tt>i</tt> was still <tt>0x56</tt> and <tt>newbits</tt> was 6,
+this would give us
+<pre>	      i			  0 1 0 1 0 1 1 0
+	&amp; ~0xf0			&amp; 0 0 0 0 1 1 1 1
+				  ---------------
+				  0 0 0 0 0 1 1 0
+	| (newbits &lt;&lt; 4)	| 0 1 1 0 0 0 0 0
+				  ---------------
+				  0 1 1 0 0 1 1 0
+</pre>
+resulting in <tt>0x66</tt>, as desired.
+<p></p><p>We've been using extra parentheses
+in several of these bitwise expressions
+because it turns out that
+(for the usual, hoary sort of ``historical reasons'')
+the precedence of
+the bitwise <tt>&amp;</tt>, <tt>|</tt>, and <tt>^</tt>
+operators is low, usually lower than we'd want.
+(The reason that they're low is that, once upon a time,
+C didn't have the logical operators <tt>&amp;&amp;</tt> and <tt>||</tt>,
+and the bitwise operators <tt>&amp;</tt> and <tt>|</tt> did double duty.)
+However, since the precedence of <tt>&amp;</tt> and <tt>|</tt>
+(and <tt>^</tt>)
+is lower than <tt>==</tt>, <tt>!=</tt>,
+<tt>&lt;&lt;, and </tt><tt>&gt;&gt;</tt>,
+expressions like
+</p><pre>	if(a &amp; 0x04 != 0)	/* WRONG */
+</pre>
+and
+<pre>	i &amp; 0xf0 &gt;&gt; 4		/* WRONG */
+</pre>
+would <em>not</em> work as desired;
+these last two would be equivalent to
+<pre>	if(a &amp; (0x04 != 0))
+	i &amp; (0xf0 &gt;&gt; 4)
+</pre>
+and would not do the bit test or subset extraction that we wanted.
+<p></p><p>[The rest of this section is somewhat advanced and may be skipped.]
+</p><p>Because of the nature of base-2 arithmetic,
+it turns out that shifting left and shifting right
+are equivalent to multiplying and dividing by two.
+These operations are equivalent for the same reason that
+tacking zeroes on to the right of a number in base 10
+is the same as multiplying by 10,
+and deleting digits from the right is the same as dividing by 10.
+You can convince yourself that
+<tt>0x56 &lt;&lt; 2</tt>
+is the same as <tt>0x56 * 4</tt>,
+and that
+<tt>0x56 &gt;&gt; 1</tt>
+is the same as <tt>0x56 / 2</tt>.
+It's also the case that masking off all but the low-order bits
+is the same as taking a remainder;
+for example,
+<tt>0x56 &amp; 0x07</tt>
+is the same as <tt>0x56 % 8</tt>.
+Some programmers therefore use
+<tt>&lt;&lt;</tt>, <tt>&gt;&gt;</tt>, and <tt>&amp;</tt>
+in preference to
+<tt>*</tt>, <tt>/</tt>, and <tt>%</tt>
+when powers of two are involved,
+on the grounds that the bitwise operators are ``more efficient.''
+Usually it isn't worth worrying about this, though,
+because most compilers are smart enough
+to perform these optimizations anyway
+(that is, if you write <tt>x * 4</tt>,
+the compiler might generate a left shift instruction all by itself),
+they're not always as readable,
+and they're not always correct for negative numbers.
+</p><p>The issue of negative numbers, by the way,
+explains why the right-shift operator <tt>&gt;&gt;</tt>
+is not precisely defined
+when the high-order bit of the value being shifted is 1.
+For signed values,
+if the high-order bit is a 1,
+the number is negative.
+(This is true for 1's complement, 2's complement,
+and sign-magnitude representations.)
+If you were using a right shift to implement division,
+you'd want a negative number to stay negative,
+so on some computers,
+under some compilers,
+when you shift a signed value right
+and the high-order bit is 1,
+new
+1 bits are shifted in at the left instead of 0s.
+However, you can't depend on this,
+because not all computers and compilers implement right shift this way.
+In any case,
+shifting negative numbers to the right
+(even if the high-order 1 bit propagates)
+gives you an incorrect answer if there's a remainder involved:
+in 2's complement, 16-bit arithmetic, -15 is <tt>0xfff1</tt>,
+so <tt>-15 &gt;&gt; 1</tt> might give you 
+<tt>0xfff8</tt>shifted
+which is -8.
+But integer division is supposed to discard the remainder,
+so <tt>-15 / 2</tt> would have given you -7.
+(If you're having trouble seeing the way the shift worked,
+<tt>0xfff1</tt> is 1111111111110001<tt>&lt;sub&gt;</tt>2<tt>&lt;/sub&gt;</tt> and
+<tt>0xfff8</tt> is 1111111111111000<tt>&lt;sub&gt;</tt>2<tt>&lt;/sub&gt;</tt>.
+The low-order 1 bit got shifted off to the right,
+but because the high-order bit was 1,
+a 1 got shifted in at the left.)
+</p><hr>
+<p>
+Read sequentially:
+<a href="http://www.eskimo.com/~scs/cclass/int/sx4b.html" rev="precedes">prev</a>
+<a href="http://www.eskimo.com/~scs/cclass/int/sx4bb.html" rel="precedes">next</a>
+<a href="http://www.eskimo.com/~scs/cclass/int/sx4b.html" rev="subdocument">up</a>
+<a href="http://www.eskimo.com/~scs/cclass/int/top.html">top</a>
+</p>
+<p>
+This page by <a href="http://www.eskimo.com/~scs/">Steve Summit</a>
+// <a href="http://www.eskimo.com/~scs/cclass/int/copyright.html">Copyright</a> 1996-1999
+// <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;tf=1&amp;to=scs@eskimo.com" target="_blank">mail feedback</a>
+</p>
+
+
+</body></html>

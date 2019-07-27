@@ -1,0 +1,3 @@
+NOP INSTRUCTION OP CODE: 0x90
+
+To fill with op code, fill the hex value 90.
